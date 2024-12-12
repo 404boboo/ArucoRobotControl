@@ -1,33 +1,71 @@
 #!/usr/bin/env python3
 
-import rclpy # Python Client Library for ROS 2
-from rclpy.node import Node # Handles the creation of nodes
-from sensor_msgs.msg import Image # Image is the message type
-from cv_bridge import CvBridge # ROS2 package to convert between ROS and OpenCV Images
-import cv2 # Python OpenCV library
+import rclpy  # Python Client Library for ROS 2
+from rclpy.node import Node  # Handles the creation of nodes
+from sensor_msgs.msg import Image  # Image is the message type
+from cv_bridge import CvBridge  # ROS2 package to convert between ROS and OpenCV Images
+import cv2  # Python OpenCV library
+import cv2.aruco as aruco  # ArUco library in OpenCV
 
 
-def listener_callback(image_data):
-    # Convert ROS Image message to OpenCV image
-    cv_image = CvBridge().imgmsg_to_cv2(image_data, "bgr8")
-    # Display image
-    cv2.imshow("camera", cv_image)
-    # Stop to show the image
-    cv2.waitKey(1)
+
+class CameraNode(Node):
+    def __init__(self):
+        super().__init__('camera_node')
+
+        # Initialize the CvBridge
+        self.bridge = CvBridge()
+
+        # Subscription to the image_raw topic
+        self.subscription = self.create_subscription(
+            Image,
+            'image_raw',  # Camera image topic
+            self.listener_callback,
+            10
+        )
+        self.get_logger().info("Camera node started and subscribing to 'image_raw'.")
+
+        # ArUco dictionary and parameters
+        self.aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_6X6_250)
+        self.parameters = aruco.DetectorParameters_create()
+
+    def listener_callback(self, image_data):
+        try:
+            # Convert ROS Image message to OpenCV image
+            cv_image = self.bridge.imgmsg_to_cv2(image_data, "bgr8")
+
+            # Convert the image to grayscale for marker detection
+            gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
+
+            # Detect ArUco markers
+            corners, ids, _ = aruco.detectMarkers(gray, self.aruco_dict, parameters=self.parameters)
+
+            # If markers are detected, draw them on the image
+            if ids is not None:
+                aruco.drawDetectedMarkers(cv_image, corners, ids)
+                self.get_logger().info(f"Detected marker IDs: {ids.flatten().tolist()}")
+
+            # Display the image with detected markers
+            cv2.imshow("ArUco Marker Detection", cv_image)
+
+            # Add a delay to refresh the image
+            cv2.waitKey(1)
+        except Exception as e:
+            self.get_logger().error(f"Error in listener_callback: {e}")
+
 
 def main(args=None):
     rclpy.init(args=args)
-    # Create the node
-    node = Node('camera_node')
-    # Log information into the console
-    node.get_logger().info('Hello node')
-    # Create the subscriber. This subscriber will receive an Image
-    # from the image_raw topic. The queue size is 10 messages.
-    subscription = node.create_subscription(Image,'image_raw',listener_callback,10)
-    # Spin the node so the callback function is called.
-    rclpy.spin(node)
-    # Spin the node so the callback function is called.
+    # Create the camera node
+    camera_node = CameraNode()
+
+    # Spin the node to process callbacks
+    rclpy.spin(camera_node)
+
+    # Shutdown the node
+    camera_node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
