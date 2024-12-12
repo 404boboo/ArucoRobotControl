@@ -1,0 +1,4 @@
+Invoking command in '/home/student/ros2_Ab/build/usb_cam': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/student/ros2_Ab/install/camera_subscriber:/opt/ros/humble /usr/bin/cmake --build /home/student/ros2_Ab/build/usb_cam -- -j4 -l4
+Invoked command in '/home/student/ros2_Ab/build/usb_cam' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/student/ros2_Ab/install/camera_subscriber:/opt/ros/humble /usr/bin/cmake --build /home/student/ros2_Ab/build/usb_cam -- -j4 -l4
+Invoking command in '/home/student/ros2_Ab/build/usb_cam': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/student/ros2_Ab/install/camera_subscriber:/opt/ros/humble /usr/bin/cmake --install /home/student/ros2_Ab/build/usb_cam
+Invoked command in '/home/student/ros2_Ab/build/usb_cam' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/student/ros2_Ab/install/camera_subscriber:/opt/ros/humble /usr/bin/cmake --install /home/student/ros2_Ab/build/usb_cam
