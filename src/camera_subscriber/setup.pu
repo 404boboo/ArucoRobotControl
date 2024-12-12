@@ -1,5 +1,0 @@
-   entry_points={
-        'console_scripts': [
-            'camera_node = camera_subscriber.camera_node:main',
-        ],
-    },
